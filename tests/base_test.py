@@ -37,7 +37,13 @@ class BaseTest:
                 options.add_argument('--no-sandbox')
                 options.add_argument('--disable-gpu')
                 options.add_argument('--window-size=1920,1080')
-            self.driver = webdriver.Chrome(service=ServiceChrome(ChromeDriverManager().install()), options=options)
+
+            chrome_install = ChromeDriverManager().install()
+            folder = os.path.dirname(chrome_install)
+            chromedriver_path = os.path.join(folder, "chromedriver.exe")
+            service = ServiceChrome(chromedriver_path)
+
+            self.driver = webdriver.Chrome(service=service, options=options)
         elif config()['browser'] == 'firefox':
             options = webdriver.FirefoxOptions()
             if config()['headless']:
@@ -50,7 +56,7 @@ class BaseTest:
             raise Exception("Incorrect Browser")
 
         self.driver.maximize_window()
-        self.wait = WebDriverWait(self.driver, 10)
+        self.wait = WebDriverWait(self.driver, 60)
         yield self.wait, self.driver
 
         if self.driver is not None:
